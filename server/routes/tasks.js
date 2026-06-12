@@ -1,5 +1,5 @@
 const express = require('express');
-const { v4: uuidv4 } = require('uuid');
+const { randomUUID } = require('crypto');
 const fs = require('fs');
 const path = require('path');
 
@@ -31,7 +31,7 @@ router.post('/', (req, res) => {
     return res.status(400).json({ error: 'Title is required' });
   }
   const task = {
-    id: uuidv4(),
+    id: randomUUID(),
     title: title.trim(),
     description: description || '',
     dueDate: dueDate || null,
