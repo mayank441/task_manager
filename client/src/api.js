@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:3000/api',
+  baseURL: 'https://task-manager-api-vdem.onrender.com/api',
 });
 
 export const getTasks = () => API.get('/tasks');
