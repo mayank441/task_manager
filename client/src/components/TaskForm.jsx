@@ -2,64 +2,146 @@ import { useState } from 'react';
 import { createTask } from '../api';
 
 export default function TaskForm({ onTaskCreated }) {
-  const [title, setTitle] = useState('');
+  const [title,       setTitle]       = useState('');
   const [description, setDescription] = useState('');
-  const [dueDate, setDueDate] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [dueDate,     setDueDate]     = useState('');
+  const [priority,    setPriority]    = useState('medium');
+  const [loading,     setLoading]     = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!title.trim()) {
-      setError('Title is required');
-      return;
-    }
+  const handleSubmit = async () => {
+    if (!title.trim()) return;
     setLoading(true);
-    setError('');
     try {
-      await createTask({ title, description, dueDate });
+      await createTask({ title, description, dueDate, priority });
       setTitle('');
       setDescription('');
       setDueDate('');
+      setPriority('medium');
       onTaskCreated();
     } catch (err) {
-      setError('Failed to create task');
+      console.error('Failed to create task', err);
     } finally {
       setLoading(false);
     }
   };
 
+  const inputStyle = {
+    width:        '100%',
+    padding:      '13px 16px',
+    borderRadius: '10px',
+    background:   'rgba(255,255,255,0.07)',
+    border:       '1.5px solid rgba(255,255,255,0.18)',
+    color:        '#f1f5f9',
+    fontSize:     '18px',
+    fontFamily:   "'Brush Script MT', 'Segoe Print', cursive",
+    outline:      'none',
+    transition:   'border 0.2s, background 0.2s',
+    colorScheme:  'dark',
+    boxSizing:    'border-box',
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="bg-white p-4 rounded-lg shadow mb-6">
-      <h2 className="text-lg font-bold mb-3 text-gray-700">Add New Task</h2>
-      {error && <p className="text-red-500 text-sm mb-2">{error}</p>}
-      <input
-        type="text"
-        placeholder="Task title *"
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className="w-full border rounded p-2 mb-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-      />
-      <input
-        type="text"
-        placeholder="Description (optional)"
-        value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        className="w-full border rounded p-2 mb-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-      />
-      <input
-        type="date"
-        value={dueDate}
-        onChange={(e) => setDueDate(e.target.value)}
-        className="w-full border rounded p-2 mb-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-      />
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 disabled:opacity-50 text-sm font-medium"
-      >
-        {loading ? 'Adding...' : 'Add Task'}
-      </button>
-    </form>
+    <div className="glass-rgb shadow-lg" style={{ padding: '24px' }}>
+
+      {/* Header — flush left, same padding as inputs */}
+      <h2 style={{
+        color:         '#e2e8f0',
+        fontSize:      '24px',
+        fontWeight:    700,
+        marginBottom:  '18px',
+        marginTop:     0,
+        fontFamily:    "'Brush Script MT', 'Segoe Print', cursive",
+        letterSpacing: 0,
+        paddingLeft:   '2px',   /* micro-nudge to align with input text */
+      }}>
+        ✦ Add New Task
+      </h2>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <input
+          type="text"
+          placeholder="Task title *"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          onKeyDown={(e) => e.key === 'Enter' && handleSubmit()}
+          onFocus={(e) => { e.target.style.border = '1.5px solid rgba(139,92,246,0.9)'; e.target.style.background = 'rgba(255,255,255,0.1)'; }}
+          onBlur={(e)  => { e.target.style.border = '1.5px solid rgba(255,255,255,0.18)'; e.target.style.background = 'rgba(255,255,255,0.07)'; }}
+          style={inputStyle}
+        />
+
+        <input
+          type="text"
+          placeholder="Description (optional)"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          onFocus={(e) => { e.target.style.border = '1.5px solid rgba(139,92,246,0.9)'; e.target.style.background = 'rgba(255,255,255,0.1)'; }}
+          onBlur={(e)  => { e.target.style.border = '1.5px solid rgba(255,255,255,0.18)'; e.target.style.background = 'rgba(255,255,255,0.07)'; }}
+          style={inputStyle}
+        />
+
+        <input
+          type="date"
+          value={dueDate}
+          onChange={(e) => setDueDate(e.target.value)}
+          onFocus={(e) => { e.target.style.border = '1.5px solid rgba(139,92,246,0.9)'; e.target.style.background = 'rgba(255,255,255,0.1)'; }}
+          onBlur={(e)  => { e.target.style.border = '1.5px solid rgba(255,255,255,0.18)'; e.target.style.background = 'rgba(255,255,255,0.07)'; }}
+          style={inputStyle}
+        />
+
+        <select
+          value={priority}
+          onChange={(e) => setPriority(e.target.value)}
+          onFocus={(e) => { e.target.style.border = '1.5px solid rgba(139,92,246,0.9)'; e.target.style.background = 'rgba(255,255,255,0.1)'; }}
+          onBlur={(e)  => { e.target.style.border = '1.5px solid rgba(255,255,255,0.18)'; e.target.style.background = 'rgba(255,255,255,0.07)'; }}
+          style={inputStyle}
+        >
+          <option value="high">High priority</option>
+          <option value="medium">Medium priority</option>
+          <option value="low">Low priority</option>
+        </select>
+
+        {/* Primary CTA — solid high-contrast purple */}
+        <button
+          onClick={handleSubmit}
+          disabled={loading || !title.trim()}
+          style={{
+            width:         '100%',
+            padding:       '15px',
+            borderRadius:  '10px',
+            border:        'none',
+            background:    loading || !title.trim()
+              ? 'rgba(255,255,255,0.07)'
+              : '#7c3aed',
+            color:         loading || !title.trim() ? '#475569' : '#ffffff',
+            fontSize:      '19px',
+            fontWeight:    700,
+            fontFamily:    "'Brush Script MT', 'Segoe Print', cursive",
+            letterSpacing: 0,
+            cursor:        loading || !title.trim() ? 'not-allowed' : 'pointer',
+            transition:    'all 0.2s ease',
+            boxShadow:     loading || !title.trim()
+              ? 'none'
+              : '0 4px 24px rgba(124,58,237,0.55), inset 0 1px 0 rgba(255,255,255,0.15)',
+            boxSizing:     'border-box',
+          }}
+          onMouseEnter={(e) => {
+            if (!loading && title.trim()) {
+              e.currentTarget.style.background  = '#6d28d9';
+              e.currentTarget.style.boxShadow   = '0 6px 28px rgba(124,58,237,0.7), inset 0 1px 0 rgba(255,255,255,0.15)';
+              e.currentTarget.style.transform   = 'translateY(-1px)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!loading && title.trim()) {
+              e.currentTarget.style.background  = '#7c3aed';
+              e.currentTarget.style.boxShadow   = '0 4px 24px rgba(124,58,237,0.55), inset 0 1px 0 rgba(255,255,255,0.15)';
+              e.currentTarget.style.transform   = 'translateY(0)';
+            }
+          }}
+        >
+          {loading ? 'Adding...' : '+ Add Task'}
+        </button>
+      </div>
+    </div>
   );
 }
