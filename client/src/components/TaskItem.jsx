@@ -308,26 +308,26 @@ export default function TaskItem({ task, onUpdate }) {
             </div>
 
             {/* Checkbox */}
-            <div
-              onClick={handleToggle}
-              style={{
-                marginTop: '2px',
-                width: '18px', height: '18px', borderRadius: '5px', flexShrink: 0,
-                border: task.completed ? '2px solid #a855f7' : '2px solid rgba(255,255,255,0.3)',
-                background: task.completed ? 'linear-gradient(135deg, #7c3aed, #a855f7)' : 'rgba(255,255,255,0.06)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                transition: 'all 0.15s ease',
-                boxShadow: task.completed ? '0 0 10px rgba(168,85,247,0.5)' : 'none',
-                cursor: 'pointer',
-                userSelect: 'none',
-              }}
-            >
-              {task.completed && (
-                <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
-                  <path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              )}
-            </div>
+<div
+  onClick={handleToggle}
+  style={{
+    marginTop: '2px',
+    width: '18px', height: '18px', borderRadius: '5px', flexShrink: 0,
+    border: task.completed ? '2px solid #a855f7' : '2px solid rgba(255,255,255,0.3)',
+    background: task.completed ? 'linear-gradient(135deg, #7c3aed, #a855f7)' : 'rgba(255,255,255,0.06)',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    transition: 'all 0.15s ease',
+    boxShadow: task.completed ? '0 0 10px rgba(168,85,247,0.5)' : 'none',
+    cursor: 'pointer',
+    userSelect: 'none',
+  }}
+>
+  {task.completed && (
+    <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+      <path d="M2 6l3 3 5-5" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )}
+</div>
 
             {/* Content */}
             <div className="flex-1 min-w-0">
@@ -519,9 +519,13 @@ export default function TaskItem({ task, onUpdate }) {
                   type="time"
                   value={newSubtaskTime}
                   onChange={(e) => setNewSubtaskTime(e.target.value)}
+                  placeholder="--:--"
                   style={{
                     ...inputStyle, width: '110px', fontSize: '12px',
                     paddingLeft: '10px', flexShrink: 0,
+                    colorScheme: 'dark',
+                    color: newSubtaskTime ? '#f1f5f9' : '#94a3b8',
+                    minHeight: '38px',
                   }}
                 />
                 <button onClick={addSubtask}

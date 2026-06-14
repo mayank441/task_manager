@@ -35,7 +35,7 @@ export default function TaskForm({ onTaskCreated }) {
     border:       '1.5px solid rgba(255,255,255,0.18)',
     color:        '#f1f5f9',
     fontSize:     '15px',
-    fontFamily:   "'Space Grotesk', sans-serif",
+    fontFamily:   "'Inter', 'Space Grotesk', sans-serif",
     outline:      'none',
     transition:   'border 0.2s, background 0.2s',
     colorScheme:  'dark',
@@ -55,15 +55,12 @@ export default function TaskForm({ onTaskCreated }) {
     <div className="glass shadow-lg" style={{ padding: '24px' }}>
 
       <h2 style={{
-        color:         'rgba(226, 232, 240, 0.75)',
+        color:         '#e2e8f0',
         fontSize:      '18px',
         fontWeight:    700,
-        fontStyle:     'italic',
-        transform:     'skewX(-8deg)',
-        display:       'inline-block',
         marginBottom:  '18px',
         marginTop:     0,
-        fontFamily:    "'Space Grotesk', sans-serif",
+        fontFamily:    "'Inter', sans-serif",
         letterSpacing: '0.02em',
       }}>
         ✦ Add New Task
@@ -94,43 +91,30 @@ export default function TaskForm({ onTaskCreated }) {
           style={inputStyle}
         />
 
-        {/* Date + Time side by side with clock label */}
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <div style={{ flex: 1, position: 'relative' }}>
-            <input
-              type="date"
-              value={dueDate}
-              onChange={(e) => setDueDate(e.target.value)}
-              onFocus={focusStyle}
-              onBlur={blurStyle}
-              style={{ ...inputStyle, width: '100%' }}
-            />
-          </div>
-          <div style={{ flex: 1, position: 'relative' }}>
-            {/* Clock icon overlaid on left */}
-            <span style={{
-              position:   'absolute',
-              left:       '14px',
-              top:        '50%',
-              transform:  'translateY(-50%)',
-              color:      dueTime ? '#c4b5fd' : '#64748b',
-              pointerEvents: 'none',
-              lineHeight: 1,
-              zIndex: 1,
-            }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-              </svg>
-            </span>
-            <input
-              type="time"
-              value={dueTime}
-              onChange={(e) => setDueTime(e.target.value)}
-              onFocus={focusStyle}
-              onBlur={blurStyle}
-              style={{ ...inputStyle, width: '100%', paddingLeft: '36px' }}
-            />
-          </div>
+        {/* Date + Time — single datetime-local works on all mobile browsers */}
+        <div style={{ position: 'relative' }}>
+          <input
+            type="datetime-local"
+            value={dueDate && dueTime ? `${dueDate}T${dueTime}` : dueDate ? `${dueDate}T00:00` : ''}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val) {
+                setDueDate(val.split('T')[0]);
+                setDueTime(val.split('T')[1] || '');
+              } else {
+                setDueDate('');
+                setDueTime('');
+              }
+            }}
+            onFocus={focusStyle}
+            onBlur={blurStyle}
+            style={{
+              ...inputStyle,
+              width: '100%',
+              colorScheme: 'dark',
+              color: (dueDate || dueTime) ? '#f1f5f9' : '#64748b',
+            }}
+          />
         </div>
 
         {/* Priority */}
@@ -159,7 +143,7 @@ export default function TaskForm({ onTaskCreated }) {
             color:         loading || !title.trim() ? '#475569' : '#ffffff',
             fontSize:      '15px',
             fontWeight:    700,
-            fontFamily:    "'Space Grotesk', sans-serif",
+            fontFamily:    "'Inter', sans-serif",
             letterSpacing: '0.03em',
             cursor:        loading || !title.trim() ? 'not-allowed' : 'pointer',
             transition:    'all 0.2s ease',
