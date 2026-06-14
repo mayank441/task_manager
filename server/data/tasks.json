@@ -4,10 +4,10 @@
     "title": "klskdk",
     "description": "",
     "dueDate": "2026-06-30",
-    "completed": true,
+    "completed": false,
     "createdAt": "2026-06-13T14:12:17.560Z",
-    "status": "done",
-    "completedAt": "2026-06-14T05:41:16.365Z"
+    "status": "in_progress",
+    "completedAt": null
   },
   {
     "id": "ced99eab-ef8e-4a83-bc83-710ed95bbdbc",
@@ -15,11 +15,25 @@
     "description": "sword Collection",
     "dueDate": "2026-12-12",
     "priority": "low",
-    "completed": false,
-    "completedAt": null,
+    "completed": true,
+    "completedAt": "2026-06-14T15:57:54.958Z",
     "createdAt": "2026-06-13T17:42:46.028Z",
-    "subtasks": [],
-    "status": "in_progress"
+    "subtasks": [
+      {
+        "id": "1781451915884",
+        "text": "nmbmb",
+        "done": true,
+        "dueTime": "12:15"
+      },
+      {
+        "id": "1781451950877",
+        "text": "yfufuyf",
+        "done": true,
+        "dueTime": "15:41"
+      }
+    ],
+    "status": "done",
+    "dueTime": ""
   },
   {
     "id": "4f1fdf72-add2-4a83-a953-3b972a4252f9",
@@ -27,9 +41,11 @@
     "description": "adada",
     "dueDate": "2026-06-16",
     "priority": "medium",
-    "status": "in_progress",
-    "completed": false,
-    "completedAt": null,
-    "createdAt": "2026-06-14T05:40:55.784Z"
+    "status": "done",
+    "completed": true,
+    "completedAt": "2026-06-14T11:32:56.892Z",
+    "createdAt": "2026-06-14T05:40:55.784Z",
+    "subtasks": [],
+    "dueTime": "23:59"
   }
 ]

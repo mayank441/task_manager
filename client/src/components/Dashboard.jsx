@@ -11,6 +11,19 @@ const STATUS_CONFIG = {
   done:        { label: 'Done',        dot: '#4ade80', pulse: false },
 };
 
+const formatDuration = (start, end) => {
+  if (!start || !end) return null;
+  const ms = new Date(end).getTime() - new Date(start).getTime();
+  if (!isFinite(ms) || ms < 0) return null;
+  const totalMinutes = Math.max(1, Math.round(ms / 60000));
+  const days    = Math.floor(totalMinutes / 1440);
+  const hours   = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+  if (days > 0)  return `${days}d ${hours}h`;
+  if (hours > 0) return `${hours}h ${minutes}m`;
+  return `${minutes}m`;
+};
+
 export default function Dashboard({ tasks }) {
   const stats = useMemo(() => {
     const total     = tasks.length;
@@ -21,7 +34,37 @@ export default function Dashboard({ tasks }) {
     const recent    = [...tasks]
       .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 4);
-    return { total, completed, active, overdue, percent, recent };
+
+    // Total duration across all completed tasks that have both createdAt and completedAt
+    const completedTasks = tasks.filter((t) => t.completed && t.createdAt && t.completedAt);
+    const totalMs = completedTasks.reduce((sum, t) => {
+      const ms = new Date(t.completedAt).getTime() - new Date(t.createdAt).getTime();
+      return sum + (isFinite(ms) && ms > 0 ? ms : 0);
+    }, 0);
+    const totalMinutes = Math.round(totalMs / 60000);
+    const days    = Math.floor(totalMinutes / 1440);
+    const hours   = Math.floor((totalMinutes % 1440) / 60);
+    const minutes = totalMinutes % 60;
+    let totalDurationLabel = null;
+    if (totalMinutes > 0) {
+      if (days > 0)       totalDurationLabel = `${days}d ${hours}h total`;
+      else if (hours > 0) totalDurationLabel = `${hours}h ${minutes}m total`;
+      else                totalDurationLabel = `${minutes}m total`;
+    }
+
+    // Avg duration per completed task
+    let avgDurationLabel = null;
+    if (completedTasks.length > 0 && totalMinutes > 0) {
+      const avgMin = Math.round(totalMinutes / completedTasks.length);
+      const ad = Math.floor(avgMin / 1440);
+      const ah = Math.floor((avgMin % 1440) / 60);
+      const am = avgMin % 60;
+      if (ad > 0)       avgDurationLabel = `${ad}d ${ah}h avg`;
+      else if (ah > 0)  avgDurationLabel = `${ah}h ${am}m avg`;
+      else              avgDurationLabel = `${am}m avg`;
+    }
+
+    return { total, completed, active, overdue, percent, recent, totalDurationLabel, avgDurationLabel, trackedCount: completedTasks.length };
   }, [tasks]);
 
   return (
@@ -47,6 +90,7 @@ export default function Dashboard({ tasks }) {
             {stats.percent}%
           </span>
         </div>
+
         <div className="w-full h-3 bg-white/10 rounded-full overflow-hidden">
           <div
             className="h-full rounded-full transition-all duration-700"
@@ -57,9 +101,17 @@ export default function Dashboard({ tasks }) {
             }}
           />
         </div>
-        <p className="text-slate-500 text-xs mt-2">
-          {stats.completed} of {stats.total} tasks completed
-        </p>
+
+        <div className="flex items-center justify-between mt-2 flex-wrap gap-1">
+          <p className="text-slate-500 text-xs">
+            {stats.completed} of {stats.total} tasks completed
+          </p>
+          {stats.totalDurationLabel && (
+            <span className="text-emerald-400 text-xs font-medium">
+              ⏱ {stats.totalDurationLabel}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* ── Status Panel ── */}
@@ -77,13 +129,10 @@ export default function Dashboard({ tasks }) {
                   className="flex items-center gap-3 px-3 py-2 rounded-xl bg-white/5 border border-white/8 hover:bg-white/8 transition-all duration-200"
                 >
                   <span style={{
-                    width:        '9px',
-                    height:       '9px',
-                    borderRadius: '50%',
-                    flexShrink:   0,
-                    background:   s.dot,
-                    boxShadow:    s.pulse ? `0 0 6px ${s.dot}` : 'none',
-                    animation:    s.pulse ? 'pulse 2s infinite' : 'none',
+                    width: '9px', height: '9px', borderRadius: '50%', flexShrink: 0,
+                    background: s.dot,
+                    boxShadow: s.pulse ? `0 0 6px ${s.dot}` : 'none',
+                    animation: s.pulse ? 'pulse 2s infinite' : 'none',
                   }} />
                   <span className="text-slate-200 text-sm truncate flex-1">{task.title}</span>
                   <span style={{ fontSize: '11px', color: s.dot, fontWeight: 600, flexShrink: 0 }}>
@@ -105,32 +154,24 @@ export default function Dashboard({ tasks }) {
           <div className="flex flex-col gap-2">
             {stats.recent.map((task) => {
               const s = STATUS_CONFIG[task.status || 'not_started'] || STATUS_CONFIG.not_started;
+              const dur = task.completed ? formatDuration(task.createdAt, task.completedAt) : null;
               return (
                 <div key={task.id} className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-white/5 border border-white/8 hover:bg-white/8 transition-all duration-200">
-                  {/* Status dot */}
                   <span style={{
-                    width:        '8px',
-                    height:       '8px',
-                    borderRadius: '50%',
-                    flexShrink:   0,
-                    background:   s.dot,
-                    boxShadow:    `0 0 5px ${s.dot}`,
-                    animation:    s.pulse ? 'pulse 2s infinite' : 'none',
+                    width: '8px', height: '8px', borderRadius: '50%', flexShrink: 0,
+                    background: s.dot,
+                    boxShadow: `0 0 5px ${s.dot}`,
+                    animation: s.pulse ? 'pulse 2s infinite' : 'none',
                   }} />
-
-                  {/* Title */}
                   <p className={`text-sm flex-1 truncate ${task.completed ? 'line-through text-slate-500' : 'text-slate-200'}`}>
                     {task.title}
                   </p>
-
-                  {/* Status label */}
-                  <span style={{
-                    fontSize:      '10px',
-                    color:         s.dot,
-                    fontWeight:    600,
-                    letterSpacing: '0.04em',
-                    flexShrink:    0,
-                  }}>
+                  {dur && (
+                    <span style={{ fontSize: '10px', color: '#34d399', fontWeight: 600, flexShrink: 0 }}>
+                      ⏱ {dur}
+                    </span>
+                  )}
+                  <span style={{ fontSize: '10px', color: s.dot, fontWeight: 600, letterSpacing: '0.04em', flexShrink: 0 }}>
                     {s.label}
                   </span>
                 </div>
