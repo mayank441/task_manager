@@ -1,13 +1,8 @@
-export default function FilterBar({ filter, setFilter, counts, density, setDensity }) {
+export default function FilterBar({ filter, setFilter, counts }) {
   const filters = [
-    { label: 'All', count: counts.active + counts.completed },
-    { label: 'Active', count: counts.active },
+    { label: 'All',       count: counts.active + counts.completed },
+    { label: 'Active',    count: counts.active },
     { label: 'Completed', count: counts.completed },
-  ];
-
-  const densityOptions = [
-    { value: 'comfortable', label: 'Comfort' },
-    { value: 'slim', label: 'Slim' },
   ];
 
   const buttonStyle = (isActive) => ({
@@ -35,18 +30,11 @@ export default function FilterBar({ filter, setFilter, counts, density, setDensi
         {filters.map(({ label, count }) => {
           const isActive = filter === label;
           return (
-            <button
-              key={label}
-              onClick={() => setFilter(label)}
-              style={buttonStyle(isActive)}
-            >
+            <button key={label} onClick={() => setFilter(label)} style={buttonStyle(isActive)}>
               {label}
               <span style={{
-                marginLeft: '8px',
-                padding: '2px 9px',
-                borderRadius: '999px',
-                fontSize: '15px',
-                fontWeight: 700,
+                marginLeft: '8px', padding: '2px 9px', borderRadius: '999px',
+                fontSize: '15px', fontWeight: 700,
                 background: isActive ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.06)',
                 color: isActive ? '#ffffff' : '#475569',
               }}>
@@ -57,37 +45,9 @@ export default function FilterBar({ filter, setFilter, counts, density, setDensi
         })}
       </div>
 
-      <div className="flex flex-wrap items-center gap-4">
-        <div className="flex gap-1.5 rounded-xl border border-white/10 bg-white/[0.03] p-1.5">
-          {densityOptions.map(({ value, label }) => {
-            const isActive = density === value;
-            return (
-              <button
-                key={value}
-                onClick={() => setDensity(value)}
-                style={{
-                  padding: '8px 14px',
-                  borderRadius: '8px',
-                  border: 'none',
-                  background: isActive ? 'rgba(139,92,246,0.32)' : 'transparent',
-                  color: isActive ? '#f8fafc' : '#64748b',
-                  fontSize: '17px',
-                  fontWeight: isActive ? 700 : 500,
-                  fontFamily: "'Brush Script MT', 'Segoe Print', cursive",
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                {label}
-              </button>
-            );
-          })}
-        </div>
-
-        <span style={{ fontSize: '17px', color: '#94a3b8', fontFamily: "'Brush Script MT', 'Segoe Print', cursive" }}>
-          {counts.active} active / {counts.completed} done
-        </span>
-      </div>
+      <span style={{ fontSize: '17px', color: '#94a3b8', fontFamily: "'Brush Script MT', 'Segoe Print', cursive" }}>
+        {counts.active} active / {counts.completed} done
+      </span>
     </div>
   );
 }
